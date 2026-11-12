@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ckb" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="تۆڕنما — فێربوونی پرۆتۆکۆلەکانی ئینتەرنێت بە هێڵکاری، سیموڵەیشن، کوردی و ئینگلیزی. TORRNAMA — bilingual network protocol explorer, by Peshbin Kamran.">
+  <meta name="theme-color" content="#0b1123">
+  <meta property="og:title" content="تۆڕنما | TORRNAMA">
+  <meta property="og:description" content="Interactive bilingual network protocol explorer, made by Peshbin Kamran.">
+  <title>تۆڕنما | TORRNAMA — Peshbin Kamran</title>
+  <link rel="icon" href="assets/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="v4.css">
+  <script defer src="data.js"></script>
+  <script defer src="script.js"></script>
+  <script defer src="knowledge.js"></script>
+  <script defer src="enhanced.js"></script>
+  <script defer src="v4.js"></script>
+</head>
+<body>
+  <div class="page-texture" aria-hidden="true"></div>
+  <div class="app" id="app">
+    <div class="mobile-shade" id="shade"></div>
+    <aside class="sidebar" id="sidebar" aria-label="Protocol library">
+      <div class="brand-head">
+        <div class="brand-logo" aria-hidden="true"><img src="assets/icon-192.png" width="44" height="44" alt=""></div>
+        <div class="brand-type"><strong id="brandName">تۆڕنما</strong><span>TORRNAMA <b class="brand-spark">✦</b> LAB</span></div>
+        <button id="closeSidebar" class="icon-btn mobile-only" aria-label="Close menu">✕</button>
+      </div>
+      <div class="sidebar-separator"></div>
+      <div class="sidebar-section-label"><span data-i18n="library">کتێبخانەی پرۆتۆکۆل</span><span class="mini-num" id="libraryCount">21</span></div>
+      <label class="search-box"><span aria-hidden="true">⌕</span><input id="search" type="search" data-i18n-placeholder="search" placeholder="گەڕان بۆ پرۆتۆکۆل..." spellcheck="false"><kbd>/</kbd></label>
+      <div class="filter-pills" id="filters" role="group" aria-label="Protocol filters"></div>
+      <nav class="protocol-list" id="protocolList" aria-label="Protocols"></nav>
+      <div class="sidebar-bottom">
+        <div class="creator-stamp"><span class="creator-avatar">PK</span><div><small data-i18n="craftedBy">دروستکراوە لەلایەن</small><strong data-i18n="author">پێشبین کامەران</strong></div><span class="stamp-star">✦</span></div>
+        <div class="build-stamp">TORRNAMA <span>•</span> <span data-i18n="educational">پڕۆژەی فێرکاری</span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="icon-btn mobile-only" id="openSidebar" aria-label="Open menu">☰</button>
+          <span class="breadcrumb-kicker" data-i18n="workspace">شوێنی کار</span><span class="breadcrumb-arrow">/</span><strong id="currentBreadcrumb">DNS</strong>
+        </div>
+        <div class="top-controls">
+          <label class="top-search"><span>⌕</span><input id="globalSearch" type="search" placeholder="گەڕان بۆ پرۆتۆکۆل / Search..." aria-label="Search protocols"><kbd>Ctrl K</kbd></label>
+          <div class="layout-toolbar" role="group" aria-label="Layout controls">
+            <button class="icon-btn" id="sideToggle" title="Show/hide protocol list" aria-label="Show/hide protocol list">◧</button>
+            <button class="icon-btn" id="diagramOnly" title="Diagram only" aria-label="Diagram only">▣</button>
+            <button class="icon-btn" id="fullScreenBtn" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+            <button class="icon-btn" id="shortcutsBtn" title="Keyboard shortcuts" aria-label="Keyboard shortcuts">⌨</button>
+          </div>
+          <span class="online-badge"><span class="pulse-light"></span><span data-i18n="apiReady">API ـی ڕاستەقینە</span></span>
+          <div class="lang-switch" role="group" aria-label="Language"><button id="langKu" class="active" data-lang="ckb">کوردی</button><button id="langEn" data-lang="en">EN</button></div>
+          <button class="icon-btn theme-btn" id="themeToggle" aria-label="Toggle color theme" title="Switch color theme"><span id="themeIcon">☀</span></button>
+        </div>
+      </header>
+      <nav class="v4-tabs" aria-label="Main navigation">
+        <button type="button" id="v4TabExplore" class="v4-tab active" aria-selected="true">◈ <span data-v4="explore">پرۆتۆکۆلەکان</span></button>
+        <button type="button" id="v4TabLab" class="v4-tab" aria-selected="false">⌘ <span data-v4="lab">تاقیگەی 3D</span></button>
+        <button type="button" id="v4TabAdmin" class="v4-tab" aria-selected="false">⚙ <span data-v4="admin">پانێڵی بەڕێوەبردن</span></button>
+        <span class="v4-tab-brand">PK / TORRNAMA 4.0</span>
+      </nav>
+      <div class="content">
+        <section class="osi-toolbar v4-explorer" aria-label="OSI model layers">
+          <div class="osi-name"><strong>OSI LAYERS</strong><small data-i18n-ext="osiHelp">چینەکانی مۆدێلی تۆڕ</small></div>
+          <div class="osi-buttons" id="osiButtons"></div>
+          <div class="osi-current"><span id="osiCurrent">APPLICATION</span><span id="osiCurrentNum">07 / 07</span></div>
+        </section>
+        <section class="intro v4-explorer">
+          <div><div class="eyebrow"><span class="star">✳</span> <span data-i18n="tagline">تاقیگەی فێربوونی تۆڕ</span> <span class="eyebrow-stroke"></span> <span>V 4.0</span></div><h1><span data-i18n="heroFirst">تۆڕەکە</span> <em data-i18n="heroHighlight">بە چاوی خۆت ببینە.</em></h1><p data-i18n="heroDesc">پرۆتۆکۆلەکانی ئینتەرنێت بە هێڵکاریی جووڵاو، فێرکاریی ورد و API ـی ڕاستەقینە فێربە.</p></div>
+          <div class="hero-stats"><div><strong id="protocolTotal">21</strong><span data-i18n="protocols">پرۆتۆکۆل</span></div><div><strong>02</strong><span data-i18n="realIntegrations">API ـی زیندوو</span></div><div><strong>02</strong><span data-i18n="languages">زمان</span></div></div>
+        </section>
+        <section class="workspace-grid v4-explorer">
+          <div class="left-stack">
+            <section class="panel visualizer" aria-labelledby="visualHeading">
+              <div class="panel-top"><div><div class="panel-overline"><span class="overline-indicator"></span><span data-i18n="interactiveVisual">بینینی کارلێککار</span></div><div class="protocol-heading"><span id="headingIcon" class="heading-icon">◎</span><h2 id="visualHeading">DNS</h2><span id="protocolPort" class="small-chip mono">53</span></div><p id="protocolSummary" class="text-subtle"></p></div><button class="outline-btn" id="restartTop"><span>↻</span><span data-i18n="restart">دووبارە</span></button></div>
+              <div class="network-window" id="networkWindow">
+                <div class="network-topline"><div><span class="tiny-led"></span><span data-i18n="networkTopology">نەخشەی پەیوەندی تۆڕ</span></div><span>NETWORK / <span id="networkBadge">DNS</span></span></div>
+                <div class="view-switch" role="group" aria-label="Diagram view"><button type="button" id="viewNetwork" class="active">◈ <span data-i18n-ext="networkView">NETWORK</span></button><button type="button" id="viewSequence">⇶ <span data-i18n-ext="sequenceView">SEQUENCE</span></button><span class="view-caption" id="viewCaption">ANIMATED VISUALIZATION</span></div>
+                <div class="sequence-container" id="sequenceContainer" hidden><div class="sequence-scroll" id="sequenceScroll"><svg id="sequenceSvg" viewBox="0 0 930 520" aria-label="Sequence diagram" role="img"></svg></div><p id="sequenceCaption" class="sequence-caption"></p></div>
+                <div class="network-scroll" id="networkScroll"><div class="network-stage" id="networkStage" role="img" aria-label="Educational network diagram">
+                  <div class="network-grid"></div>
+                  <svg class="network-wires" id="networkWires" viewBox="0 0 900 350" aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+                    <defs><linearGradient id="edgeGradient"><stop stop-color="#5dc9ff" stop-opacity=".65"/><stop offset="1" stop-color="#8d7cff" stop-opacity=".65"/></linearGradient><filter id="nodeGlow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+                    <path id="edge-client-router" class="edge" d="M 170 201 L 330 164"/>
+                    <path id="edge-router-cloud" class="edge" d="M 330 164 L 493 210"/>
+                    <path id="edge-cloud-server" class="edge" d="M 493 210 L 745 250"/>
+                    <path id="edge-cloud-dns" class="edge" d="M 493 210 L 746 90"/>
+                    <path id="edge-client-server" class="edge secondary-edge" d="M 170 201 Q 460 302 745 250"/>
+                    <path id="edge-router-server" class="edge secondary-edge" d="M 330 164 Q 525 125 745 250"/>
+                    <path id="edge-dns-router" class="edge secondary-edge" d="M 746 90 Q 528 42 330 164"/>
+                    <circle id="packetHalo" cx="170" cy="201" r="17" fill="#61dfff" opacity="0" filter="url(#nodeGlow)"/>
+                    <circle id="packetDot" cx="170" cy="201" r="7" fill="#79e6fb" opacity="0" stroke="#fff" stroke-width="2"/>
+                  </svg>
+                  <div class="device client" id="node-client" data-node="client"><div class="device-body"><div class="device-glyph">▤</div><i class="device-status"></i></div><strong data-node-label="client">کڕیار</strong><small>192.168.1.10</small></div>
+                  <div class="device router" id="node-router" data-node="router"><div class="device-body"><div class="device-glyph">◈</div><i class="device-status"></i></div><strong data-node-label="router">ڕاوتەر</strong><small>192.168.1.1</small></div>
+                  <div class="device cloud" id="node-cloud" data-node="cloud"><div class="device-body cloud-shape"><div class="device-glyph">◎</div><i class="device-status"></i></div><strong data-node-label="cloud">ئینتەرنێت</strong><small>WAN</small></div>
+                  <div class="device dns" id="node-dns" data-node="dns"><div class="device-body"><div class="device-glyph">⌘</div><i class="device-status"></i></div><strong data-node-label="dns">DNS سێرڤەر</strong><small>8.8.8.8</small></div>
+                  <div class="device server" id="node-server" data-node="server"><div class="device-body"><div class="device-glyph">▥</div><i class="device-status"></i></div><strong data-node-label="server">وێب سێرڤەر</strong><small>203.0.113.10</small></div>
+                  <span class="diagram-watermark">PK / TORRNAMA</span>
+                </div></div>
+                <div class="swipe-hint" data-i18n="swipeHint">بۆ بینینی هەموو نەخشەکە بە لاوە ڕاکێشە ↔</div><div class="network-footline"><span><span class="legend-dot blue"></span><span data-i18n="simulatedPaths">ڕێڕەوی سیموڵەکراو</span></span><span><span class="legend-dot green"></span><span data-i18n="activeTransfer">گواستنەوەی چالاک</span></span><span class="footline-note">DEMO / NOT PACKET CAPTURE</span></div>
+              </div>
+              <div class="playback"><div class="playback-controls"><button id="prevBtn" class="ctrl-btn" title="Previous step" aria-label="Previous step">↤</button><button id="playBtn" class="play-btn"><span id="playSymbol">▶</span><span id="playText" data-i18n="play">دەستپێکردن</span></button><button id="nextBtn" class="ctrl-btn" title="Next step" aria-label="Next step">↦</button><button id="resetBtn" class="ctrl-btn" title="Reset" aria-label="Reset">↻</button></div><div class="playback-meta"><span class="step-counter mono" id="stepCounter">00 / 04</span><label class="speed-control"><span data-i18n="speed">خێرایی</span><select id="speedSelect"><option value="8600">0.75×</option><option value="6400" selected>1×</option><option value="4600">1.5×</option><option value="3200">2×</option></select></label></div></div>
+              <div class="progress-strip" id="progressStrip" aria-label="Simulation steps"></div>
+            </section>
+            <section class="panel packets-panel"><div class="section-heading"><div><span class="small-overline" data-i18n="liveTrace">تۆماری هەنگاوەکان</span><h3 data-i18n="packetFlow">ڕەوتی پاکێتەکان</h3></div><span class="count-chip" id="flowCount">0 / 4</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th data-i18n-ext="time">کات</th><th data-i18n-ext="source">سەرچاوە</th><th data-i18n-ext="destination">مەبەست</th><th data-i18n-ext="protocol">پرۆتۆکۆل</th><th data-i18n-ext="info">زانیاری / پەیام</th><th data-i18n-ext="size">قەبارە</th></tr></thead><tbody id="packetRows"></tbody></table></div></section>
+          </div>
+          <div class="right-stack">
+            <section class="panel lesson-panel"><div class="lesson-top"><span class="small-overline" data-i18n="stepByStep">فێربوون هەنگاو بە هەنگاو</span><span id="lessonFraction" class="lesson-fraction mono">01 / 04</span></div><div class="lesson-icon">✧</div><h3 id="lessonTitle"></h3><p id="lessonDescription"></p><div class="step-deep-dive" id="stepDeepDive" aria-live="polite"></div><button class="read-all-btn" id="readAllLesson" type="button">▤ <span data-i18n-ext="allSteps">ڕوونکردنەوەی تەواوی هەموو هەنگاوەکان</span></button><div class="packet-meta"><div><span data-i18n="message">پەیام</span><strong class="mono" id="lessonPacket">—</strong></div><div><span data-i18n="direction">ئاڕاستە</span><strong id="lessonDirection">—</strong></div></div><div class="lesson-complete" id="lessonComplete" hidden></div><div class="learn-panel"><div class="learn-heading"><span>✦</span><strong data-i18n="simpleExample">نموونەیەکی سادە</strong></div><p id="analogyText"></p></div></section>
+            <section class="panel about-panel"><div class="section-heading"><div><span class="small-overline" data-i18n="protocolNotes">تێبینییە گرنگەکان</span><h3 data-i18n="quickFacts">زانیاری زیاتر</h3></div><span class="about-emblem">✳</span></div><div class="spec-grid"><div><span data-i18n="osiLayer">چینی OSI</span><strong id="osiValue" class="mono">7</strong></div><div><span data-i18n="defaultPort">پۆرت</span><strong id="portValue" class="mono">53</strong></div></div><ul id="protocolFacts" class="facts-list"></ul></section>
+            <section class="panel api-panel"><div class="section-heading"><div><span class="small-overline">API LAB / REAL NETWORK</span><h3 data-i18n="liveApiLab">تاقیگەی API ـی زیندوو</h3></div><span id="apiModeBadge" class="mode-badge">LIVE</span></div><p class="api-explainer" id="apiExplainer"></p><label class="api-input-label" for="apiDomain" id="apiLabel" data-i18n="domain">ناوی دۆمەین</label><div class="api-form"><input id="apiDomain" dir="ltr" value="example.com" spellcheck="false" autocomplete="off" placeholder="example.com"><button id="apiRun" class="api-run-btn"><span>↗</span><span data-i18n="sendRequest">ناردنی داواکاری</span></button></div><div class="api-endpoint mono" id="apiEndpoint" dir="ltr"></div><div class="api-state" id="apiState" role="status" aria-live="polite"></div><details class="json-details"><summary><span data-i18n="apiResponse">وەڵامی API (JSON)</span><span>⌄</span></summary><pre id="apiJson" dir="ltr">{ "status": "ready" }</pre></details><div class="api-links"><a href="https://developers.google.com/speed/public-dns/docs/doh/json" target="_blank" rel="noopener noreferrer">Google DNS ↗</a><a href="https://jsonplaceholder.typicode.com/" target="_blank" rel="noopener noreferrer">JSONPlaceholder ↗</a></div></section>
+          </div>
+        </section>
+        <section class="knowledge-shell v4-explorer panel" id="knowledgeSection">
+          <div class="knowledge-heading"><div><span class="small-overline">NETWORK ACADEMY / PK</span><h2 data-i18n-ext="moreInfo">زانیاری زیاتر — زانکۆی تۆڕ</h2><p data-i18n-ext="knowledgeIntro">ڕوونکردنەوەی تەواو لەسەر بنەماکانی تۆڕ، ئینتەرنێت، پرۆتۆکۆلەکان و چۆنیەتی کارکردنیان.</p></div><span class="knowledge-logo">PK</span></div>
+          <div class="knowledge-search-row"><label class="knowledge-search">⌕ <input id="knowledgeSearch" type="search" placeholder="گەڕان لە بابەتەکان..." aria-label="Search topics"></label><div id="knowledgeCount" class="count-chip"></div></div>
+          <div class="knowledge-grid" id="knowledgeGrid"></div>
+        </section>
+
+        <section id="v4Lab" class="v4-section panel" aria-label="3D topology lab">
+          <div class="v4-hero"><div><span class="small-overline">TORRNAMA / INTERACTIVE LAB</span><h2 data-v4="labTitle">تاقیگەی تۆڕی 3D</h2><p data-v4="labIntro">ئامێرەکان زیاد بکە، ڕایانبکێشە، پەیوەندی دروست بکە و ڕێڕەوی Ping، DNS و HTTP بە سیموڵەیشن تاقی بکەرەوە.</p></div><span class="v4-tag">ISOMETRIC LAB</span></div>
+          <div class="v4-lab-tools" id="v4LabTools">
+            <button data-add="laptop" type="button">＋ 💻 <span data-v4="addClient">کڕیار</span></button><button data-add="router" type="button">＋ ◈ <span data-v4="addRouter">ڕاوتەر</span></button><button data-add="switch" type="button">＋ ▦ <span data-v4="addSwitch">سوویچ</span></button><button data-add="server" type="button">＋ ▤ <span data-v4="addServer">سێرڤەر</span></button><button data-add="dns" type="button">＋ ◎ DNS</button><button data-add="firewall" type="button">＋ ◇ <span data-v4="addFirewall">فایەروۆڵ</span></button>
+            <button type="button" id="v4LinkBtn" class="v4-tool-secondary" data-v4="link">بەستنەوەی ئامێرەکان</button><button type="button" id="v4DeleteBtn" class="v4-tool-secondary" data-v4="delete">سڕینەوەی هەڵبژێردراو</button>
+          </div>
+          <div class="v4-lab-layout">
+            <div class="v4-lab-main"><div class="v4-scene-head"><strong data-v4="topology">نەخشەی تۆڕی 3D</strong><span data-v4="dragHint">ئامێرەکان بە ماوس ڕابکێشە • دوو ئامێر هەڵبژێرە بۆ بەستنەوە</span></div><svg id="v4LabSvg" class="v4-lab-svg" viewBox="0 0 920 500" role="img" aria-label="Interactive network lab"></svg></div>
+            <div class="v4-lab-side"><h3 data-v4="inspector">وردەکاریی ئامێر</h3><p id="v4SelectedName" class="v4-status"></p><label><span data-v4="deviceName">ناو</span><input id="v4NodeName" maxlength="32" placeholder="Router 1"></label><label><span>IP Address</span><input id="v4NodeIP" dir="ltr" maxlength="45" placeholder="192.168.1.1"></label><button id="v4ApplyNode" type="button" class="v4-action" data-v4="apply">پاشەکەوتی گۆڕانکاری</button><hr><h3 data-v4="simulate">سیموڵەیشن</h3><label><span data-v4="testType">جۆری تاقیکردنەوە</span><select id="v4Test"><option value="ping">Ping (ICMP)</option><option value="dns">DNS lookup</option><option value="http">HTTP Request</option></select></label><button id="v4RunTest" type="button" class="v4-action" data-v4="run">▶ دەستپێکردنی تاقیکردنەوە</button><button id="v4StepTest" type="button" data-v4="step">هەنگاوی داهاتوو</button><button id="v4ResetTest" type="button" data-v4="clearTrace">سڕینەوەی ڕێڕەو</button><div id="v4TestLog" class="v4-log" aria-live="polite"></div></div>
+          </div>
+          <div class="v4-lab-bottom"><button id="v4SaveLab" type="button" data-v4="saveTopology">پاشەکەوتی نەخشە لەم Browser ـە</button><button id="v4DownloadLab" type="button" data-v4="downloadTopology">داگرتنی JSON</button><label class="v4-upload"><span data-v4="importTopology">هاوردەکردنی JSON</span><input id="v4ImportLab" type="file" accept="application/json,.json" hidden></label><button id="v4ResetLab" type="button" data-v4="resetTopology">گەڕاندنەوەی نموونە</button></div>
+          <p class="v4-simulation-note" data-v4="simulationNote">ئەم تاقیگەیە سیموڵەیشنی فێرکارییە، نەک تاقیکردنەوەی پاکێتی ڕاستەقینەی سیستەم؛ هیچ داواکارییەکی Ping لە تۆڕی ڕاستەقینە نەنێرێت.</p>
+        </section>
+        <section id="v4Admin" class="v4-section panel" aria-label="Admin editing studio">
+          <div class="v4-hero"><div><span class="small-overline">CONTENT STUDIO / LOCAL WORKSPACE</span><h2 data-v4="adminTitle">پانێڵی بەڕێوەبردنی ناوەڕۆک</h2><p data-v4="adminIntro">دەقی کوردی و ئینگلیزیی وانەکان دەستکاری بکە و JSON ـی گۆڕانکارییەکان بۆ خۆت هەڵبگرە.</p></div><span class="v4-tag">LOCAL DRAFT</span></div>
+          <div class="v4-warning" data-v4="adminWarning">ئاگاداری: ئەمە دەستکاریکەری ناوخۆییە، نەک پانێڵی Admin ـی پارێزراوی ئۆنلاین. گۆڕانکارییەکان تەنها لە Browser ـی ئێستادا دەبینرێن؛ بۆ بڵاوکردنەوە بۆ هەموو سەردانیکەران پێویستە فایلەکان نوێ بکەیتەوە یان Backend و Login ـی پارێزراو زیاد بکەیت.</div>
+          <div class="v4-editor-grid"><div class="v4-edit-panel"><label><span data-v4="chooseProtocol">پرۆتۆکۆل هەڵبژێرە</span><select id="v4EditProtocol"></select></label><label><span data-v4="kuDescription">ڕوونکردنەوە بە کوردی سۆرانی</span><textarea id="v4EditKu" rows="7"></textarea></label><label><span data-v4="enDescription">English explanation</span><textarea id="v4EditEn" rows="7" dir="ltr"></textarea></label><div class="v4-editor-actions"><button id="v4SaveDraft" class="v4-action" type="button" data-v4="saveDraft">پاشەکەوتی دەستکارییەکان</button><button id="v4ResetDraft" type="button" data-v4="resetDraft">گەڕاندنەوەی دەقی سەرەکی</button></div></div><div class="v4-edit-panel"><h3 data-v4="draftTools">ئامرازەکانی بەڕێوەبردن</h3><p data-v4="draftHelp">دەقی گۆڕدراو لە هەمان Browser دا دەمێنێتەوە؛ JSON دابگرە بۆ Backup و بۆ بەکارهێنان لە وەشانی داهاتوو.</p><button id="v4ExportDrafts" type="button" data-v4="exportDrafts">داگرتنی دەستکارییەکان</button><label class="v4-upload"><span data-v4="importDrafts">هاوردەکردنی دەستکارییەکان</span><input type="file" id="v4ImportDrafts" accept=".json,application/json" hidden></label><div id="v4AdminStatus" class="v4-log" role="status"></div><div class="v4-branding"><img src="assets/torrnama-logo.jpg" alt="Torrnama logo"><div><strong>تۆڕنما / TORRNAMA</strong><small>پێشبین کامەران · م. دانا حەسەن</small></div></div></div></div>
+        </section>
+        <section class="notice"><span class="notice-icon">ⓘ</span><p data-i18n="disclaimer">هێڵکاری و پاکێتە جووڵاوەکان تەنها سیموڵەیشنی فێرکارین، نەک پاکێتی ڕاستەقینەی تۆڕ. تەنها بەشەکانی DNS و HTTP بە API ـی گشتی داواکاری ڕاستەقینە دەنێرن.</p></section>
+        <footer class="footer"><div><span class="footer-logo">⬡</span><strong>TORRNAMA</strong><span>© 2026</span></div><span><span data-i18n="madeBy">دیزاین و پەرەپێدان:</span> <strong data-i18n="author">پێشبین کامەران</strong> · <span data-i18n-ext="supervisedBy">بە سەرپەرشتی م. دانا حەسەن</span></span><span data-i18n="footerDesc">دروستکراوە بۆ فێربوون و خوێندنەوەی ئازاد.</span></footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="helpDialog" class="pk-dialog"><div class="dialog-bar"><h2 id="helpTitle">Keyboard shortcuts</h2><button id="closeHelp" class="icon-btn" aria-label="Close">✕</button></div><div id="helpContent"></div></dialog>
+  <dialog id="packetDialog" class="pk-dialog"><div class="dialog-bar"><h2 id="packetTitle">Packet inspector</h2><button id="closePacket" class="icon-btn" aria-label="Close">✕</button></div><div id="packetContent"></div></dialog>
+</body>
+</html>

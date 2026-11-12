@@ -1,0 +1,93 @@
+/* TORRNAMA v3 upgrades — synchronized sequence view, bilingual lesson textbook,
+   keyboard shortcuts, seven OSI layers, guided reference, packet inspection. */
+(() => {
+'use strict';
+const api=window.TorrnamaBridge;
+if(!api){console.error('TORRNAMA core missing');return}
+const $=id=>document.getElementById(id);
+const l=b=>b?.[api.state.lang]||b?.en||'';
+const ku=()=>api.state.lang==='ckb';
+const label=(a,b)=>ku()?a:b;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let view='network';
+let currentModal=null;
+let selectedOSI=null;
+const txt={
+ ckb:{osiHelp:'چینەکانی مۆدێلی تۆڕ',networkView:'نەخشەی تۆڕ',sequenceView:'ڕیزبەندی پەیامەکان',moreInfo:'زانیاری زیاتر — زانکۆی تۆڕ',knowledgeIntro:'کتێبخانەیەکی بەرفراوان بۆ فێربوونی بنەماکانی تۆڕ، پرۆتۆکۆلەکان و ڕێنماییە پیشەییەکان.',allSteps:'ڕوونکردنەوەی تەواوی هەموو هەنگاوەکان',supervisedBy:'بە سەرپەرشتی م. دانا حەسەن',time:'کات*',source:'سەرچاوە',destination:'مەبەست',protocol:'پرۆتۆکۆل',info:'زانیاری / پەیام',size:'قەبارە*',why:'بۆچی ئەم هەنگاوە گرنگە؟',observe:'چی تێبینی بکەیت؟',technical:'ڕوونکردنەوەی تەکنیکی',done:'وانەکە تەواو بوو',finished:'هەموو هەنگاوەکانت بینی. دەتوانیت هەمان سیموڵەیشن دووبارە بکەیتەوە یان زانیاریی هەر قۆناغێک بخوێنیتەوە.',sourceNote:'تێبینی: کات و قەبارەکان نموونەی فێرکارین؛ پاکێتی ڕاستەقینەی تۆڕ نیین.',sequenceNote:'تیرەکان ڕیزبەندی ناردنی پەیامەکان پیشان دەدەن؛ جووڵەکە فێرکارییە و کاتی ڕاستەقینەی تۆڕ نییە.',allLessons:'هەموو هەنگاوەکانی',packetInspector:'وردەکاریی پەیام',shortcuts:'کورتەڕێگاکانی کیبۆرد',help:'یارمەتی',osiLesson:'چینی OSI',close:'داخستن',allTopics:'بابەت',readTopic:'بابەتەکە بخوێنەوە',noTopic:'هیچ بابەتێک نەدۆزرایەوە.',steps:'هەنگاو',packet:'پەیام',diagram:'هێڵکاری',builtBy:'پێشبین کامەران',intro:'ئەم سیموڵەیشنە بۆ ڕوونکردنەوەی بیرۆکەی پرۆتۆکۆل دروست کراوە، نەک بۆ تۆمارکردنی پاکێتەکان.',from:'نێرەر',to:'وەرگر',example:'نموونە و بیرۆکە',supervisor:'م. دانا حەسەن',overview:'کورتەی وانە',deeper:'وردەکاری هەنگاو',keyboardSearch:'گەڕان لە پرۆتۆکۆل',fullscreen:'پڕکردنەوەی شاشە',layout:'گۆڕینی ڕووکار',darkMode:'گۆڕینی ڕەنگی شەو و ڕۆژ',next:'هەنگاوی داهاتوو',previous:'هەنگاوی پێشوو',play:'دەستپێکردن / وەستاندن',question:'پرسیاری فێرکاری',takeaway:'ئەوەی پێویستە بیزانیت'},
+ en:{osiHelp:'The seven reference layers',networkView:'NETWORK',sequenceView:'SEQUENCE',moreInfo:'More information — Network academy',knowledgeIntro:'A bilingual learning library covering fundamental networking, Internet protocols and practical concepts.',allSteps:'Read every step in detail',supervisedBy:'Supervised by M. Dana Hasan',time:'Time*',source:'Source',destination:'Destination',protocol:'Protocol',info:'Info / message',size:'Size*',why:'Why does this step matter?',observe:'What should you notice?',technical:'Technical explanation',done:'Lesson complete',finished:'You have seen every stage. Replay the animation or read the detailed notes for any earlier step.',sourceNote:'Note: Time and size values are educational examples, not live packet measurements.',sequenceNote:'Arrows illustrate the order of messages. Animation time does not reflect measured network latency.',allLessons:'All steps in',packetInspector:'Message inspector',shortcuts:'Keyboard shortcuts',help:'Help',osiLesson:'OSI layer',close:'Close',allTopics:'topics',readTopic:'Read chapter',noTopic:'No matching topics.',steps:'steps',packet:'Message',diagram:'Diagram',builtBy:'Peshbin Kamran',intro:'This is a learning illustration of the protocol, not captured network traffic.',from:'From',to:'To',example:'Analogy and context',supervisor:'M. Dana Hasan',overview:'Lesson overview',deeper:'Current step in depth',keyboardSearch:'Search protocols',fullscreen:'Fullscreen',layout:'Change layout',darkMode:'Toggle theme',next:'Next step',previous:'Previous step',play:'Play / pause',question:'Study question',takeaway:'What to remember'}
+};
+const T=k=>txt[api.state.lang][k]||k;
+function getStep(){return api.proto().steps[Math.max(0,api.state.index)]}
+function status(){return api.state.reached>=api.proto().steps.length-1?'complete':api.state.reached>=0?'progress':'ready'}
+const nodes=['client','router','cloud','dns','server'];
+const laneX={client:138,router:300,cloud:464,dns:625,server:790};
+const ips={client:'192.168.1.10',router:'192.168.1.1',cloud:'WAN',dns:'8.8.8.8',server:'203.0.113.10'};
+function renderSequence(){const p=api.proto(),steps=p.steps,i=api.state.index,reached=api.state.reached,svg=$('sequenceSvg');
+ const h=Math.max(430,124+steps.length*79);svg.setAttribute('viewBox',`0 0 930 ${h}`);
+ const active=steps.filter(s=>s.from==='dns'||s.to==='dns').length>0;
+ const used=nodes.filter(id=>id!=='cloud'||p.steps.some(s=>s.from==='cloud'||s.to==='cloud'));
+ const svgLines=used.map(id=>`<g class="sequence-lane"><text class="sequence-lane-label" text-anchor="middle" x="${laneX[id]}" y="37">${esc(api.t(id))}</text><text class="sequence-lane-ip" text-anchor="middle" x="${laneX[id]}" y="59">${ips[id]}</text><line class="sequence-lifeline" x1="${laneX[id]}" y1="76" x2="${laneX[id]}" y2="${h-26}" /></g>`).join('');
+ const pathRows=steps.map((s,n)=>{const y=114+n*79,x1=laneX[s.from]??138,x2=laneX[s.to]??790,y2=y+24,ok=n<=reached,now=n===i;
+   const cc=s.from==='dns'||s.to==='dns'?'#5f9fff':s.packet.en.toUpperCase().includes('SYN')||p.id==='tcp'?'#45bba4':s.from==='server'?'#8e75ec':'#efa84f';
+   const short=l(s.packet).length>27?l(s.packet).slice(0,24)+'…':l(s.packet);
+   return `<g class="sequence-row ${ok?'seen':'pending'} ${now?'selected':''}" data-seq-step="${n}" tabindex="0" role="button" aria-label="${esc(label('هەنگاوی','Step'))} ${n+1}: ${esc(l(s.title))}"><rect class="seq-hit" x="5" y="${y-33}" width="919" height="69" rx="8"/><text x="20" y="${y-15}" class="sequence-step-index">${String(n+1).padStart(2,'0')}</text><text x="20" y="${y+6}" class="sequence-step-time">${(n*.024).toFixed(3)}s</text><path d="M ${x1} ${y} L ${x2} ${y2}" stroke="${cc}" class="seq-message ${ok?'seq-visible':''} ${now&&reached===n?'seq-active':''}" marker-end="url(#arr-${n})"/><defs><marker id="arr-${n}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="${cc}"/></marker></defs><text x="${(x1+x2)/2}" y="${y-12}" text-anchor="middle" fill="${cc}" class="sequence-message-label">${esc(short)}</text>${now&&reached===n?`<circle r="7" fill="${cc}" stroke="white" stroke-width="2"><animateMotion path="M ${x1} ${y} L ${x2} ${y2}" dur="${Math.round(api.state.speed*.8)}ms" fill="freeze" repeatCount="1"/></circle>`:''}</g>`}).join('');
+ svg.innerHTML=`<defs><linearGradient id="seqBG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5b96ed" stop-opacity=".08"/><stop offset="1" stop-color="#9786e9" stop-opacity=".02"/></linearGradient></defs><rect x="0" y="0" width="930" height="${h}" fill="url(#seqBG)"/>${svgLines}${pathRows}`;
+ svg.querySelectorAll('[data-seq-step]').forEach(g=>{const f=()=>api.jumpToStep(Number(g.dataset.seqStep));g.addEventListener('click',f);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}})});
+ $('sequenceCaption').textContent=T('sequenceNote');
+ if(view==='sequence'&&api.state.playing){const current=svg.querySelector('.sequence-row.selected');if(current){const y=current.getBBox().y;$('sequenceScroll').scrollTo({top:Math.max(0,y-170),behavior:'smooth'})}}
+}
+function setView(v){view=v==='sequence'?'sequence':'network';$('sequenceContainer').hidden=view!=='sequence';$('networkScroll').hidden=view!=='network';$('viewNetwork').classList.toggle('active',view==='network');$('viewSequence').classList.toggle('active',view==='sequence');$('viewCaption').textContent=view==='network'?'TOPOLOGY / ANIMATED':'MESSAGE TIMELINE / ANIMATED';renderSequence()}
+function renderOSI(){const layerNames=['PHYSICAL','DATA LINK','NETWORK','TRANSPORT','SESSION','PRESENTATION','APPLICATION'];const layer=Number(api.proto().layer)||7;
+ $('osiButtons').innerHTML=layerNames.map((name,n)=>`<button type="button" data-osi="${n+1}" class="${layer===n+1?'chosen':''}" title="${esc(name)}" aria-label="OSI ${n+1}: ${esc(name)}">${n+1}</button>`).join('');
+ $('osiCurrent').textContent=layerNames[layer-1];$('osiCurrentNum').textContent=`${String(layer).padStart(2,'0')} / 07`;
+ $('osiButtons').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>showOSI(Number(b.dataset.osi))));
+}
+function showOSI(n){const names=['Physical','Data Link','Network','Transport','Session','Presentation','Application'];const b=window.TORRNAMA_OSI[n-1]; const possible=window.PROTOCOLS.filter(p=>Number(p.layer)===n);
+ $('helpTitle').textContent=`${T('osiLesson')} ${n} — ${names[n-1]}`;
+ $('helpContent').innerHTML=`<p class="modal-lead">${esc(l(b))}</p><div class="modal-section"><strong>${esc(label('پرۆتۆکۆلە پەیوەندیدارەکان','Related protocols'))}</strong><p>${possible.length?possible.map(p=>p.name).join(' · '):esc(label('لە وەشانی ئێستادا نموونەیەکی سەربەخۆی بۆ دانەنراوە.','No separate protocol demo for this layer in this version.'))}</p></div><p class="modal-note">${esc(label('OSI مۆدێلێکی فێرکارییە؛ هەموو پرۆتۆکۆلێک بە تەواوی تەنها لە یەک چین دانانرێت.','OSI is a reference model; real protocols do not always map neatly to one layer.'))}</p>`;
+ $('helpDialog').showModal();
+}
+function stepExplanation(){const p=api.proto(),s=getStep(),n=api.state.index,origin=api.t(s.from),dest=api.t(s.to),packet=l(s.packet),reason=l(window.TORRNAMA_PROTOCOL_DEPTH[p.id]||p.desc);const fact=l(p.facts[n%p.facts.length]);
+ const observation=ku()?`لە نەخشەکەدا سەرچاوە «${origin}» و مەبەست «${dest}» دیاری بکە. پەیامی «${packet}» لە ڕێڕەوی هێڵکارییەکەدا دەجووڵێت؛ ئەم تیرە تەنها نیشاندانی شوێنی گواستنەوەی داتایە. لە بەشی Sequence هەمان هەنگاو بە شێوەیەکی ڕیزکراو دەبینیت.`:`Locate “${origin}” and “${dest}” in the diagram. The message “${packet}” moves between the illustrated endpoints. The arrow communicates the logical direction of a message. The Sequence view shows the same step in chronological order.`;
+ const importance=ku()?`ئەمە هەنگاوی ${n+1} لە ${p.steps.length} هەنگاوەکەی وانەی ${p.name} ـە. ${l(s.detail)} ئەم هەنگاوە یارمەتی دەدات تێبگەیت کە چۆن هەر بەشێکی تۆڕ ئەرکی خۆی جێبەجێ دەکات و بۆچی پێویستە پەیامەکان بە ڕیزبەندییەکی دیاریکراو ئاڵوگۆڕ بکرێن.`:`This is step ${n+1} of ${p.steps.length} in the ${p.name} lesson. ${l(s.detail)} It shows how each component plays its part and why message order matters to the overall process.`;
+ $('stepDeepDive').innerHTML=`<div class="deep-section"><h4>◈ ${esc(T('why'))}</h4><p>${esc(importance)}</p></div><div class="deep-section"><h4>⇶ ${esc(T('observe'))}</h4><p>${esc(observation)}</p></div><div class="deep-section"><h4>✧ ${esc(T('technical'))}</h4><p>${esc(reason)}</p><p>${esc(fact)}</p></div><div class="deep-note">${esc(T('sourceNote'))}</div>`;
+ const c=$('lessonComplete');const complete=status()==='complete'&&!api.state.playing;c.hidden=!complete;if(complete)c.innerHTML=`<div class="complete-icon">✓</div><strong>${esc(T('done'))}</strong><p>${esc(T('finished'))}</p><div class="complete-tags"><span>${p.steps.length} ${esc(T('steps'))}</span><span>OSI ${p.layer}</span><span>${p.name}</span></div>`;
+}
+function showFullLesson(){const p=api.proto();$('helpTitle').textContent=`${T('allLessons')} ${p.name}`;
+ const long=p.steps.map((s,i)=>`<article class="all-step"><span class="all-step-num">${esc(T('steps'))} ${i+1} / ${p.steps.length}</span><h3>${esc(l(s.title))}</h3><p>${esc(l(s.detail))}</p><p>${esc(l(window.TORRNAMA_PROTOCOL_DEPTH[p.id]||p.desc))}</p><div class="mini-meta"><b>${esc(T('from'))}:</b> ${esc(api.t(s.from))}　<b>${esc(T('to'))}:</b> ${esc(api.t(s.to))}　<b>${esc(T('packet'))}:</b> ${esc(l(s.packet))}</div><button class="jump-step" data-jump="${i}">${esc(label('پیشاندانی ئەم هەنگاوە لە نەخشە','Show this step in diagram'))}</button></article>`).join('');
+ $('helpContent').innerHTML=`<p class="modal-lead">${esc(l(p.desc))}</p><p class="modal-note">${esc(T('intro'))}</p>${long}<div class="modal-section"><h3>${esc(T('takeaway'))}</h3>${p.facts.map(f=>`<p>• ${esc(l(f))}</p>`).join('')}</div>`;
+ $('helpContent').querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{api.jumpToStep(Number(b.dataset.jump));$('helpDialog').close();document.querySelector('.visualizer').scrollIntoView({behavior:'smooth',block:'start'})});$('helpDialog').showModal();
+}
+function inspectPacket(n){const p=api.proto(),s=p.steps[n];if(!s)return;$('packetTitle').textContent=`${T('packetInspector')} #${n+1}`;
+ $('packetContent').innerHTML=`<p class="modal-lead">${esc(l(s.title))}</p><div class="inspector-grid"><div><span>${T('source')}</span><b>${esc(ips[s.from])}</b></div><div><span>${T('destination')}</span><b>${esc(ips[s.to])}</b></div><div><span>${T('protocol')}</span><b>${p.name}</b></div><div><span>${T('time')}</span><b>${(n*.024).toFixed(3)} s</b></div><div><span>${T('info')}</span><b>${esc(l(s.packet))}</b></div><div><span>${T('size')}</span><b>${[74,90,66,140,488,120][n%6]} B</b></div></div><div class="modal-section"><h3>${T('deeper')}</h3><p>${esc(l(s.detail))}</p><p>${esc(l(window.TORRNAMA_PROTOCOL_DEPTH[p.id]||p.desc))}</p></div><p class="modal-note">${esc(T('sourceNote'))}</p><button class="jump-step" id="inspectJump">${esc(label('چوون بۆ ئەم هەنگاوە','Go to this step'))}</button>`;
+ $('inspectJump').onclick=()=>{api.jumpToStep(n);$('packetDialog').close()};$('packetDialog').showModal();
+}
+function renderKnowledge(){const all=window.TORRNAMA_KNOWLEDGE||[];let q=$('knowledgeSearch').value.toLocaleLowerCase();const subset=all.filter(t=>[...Object.values(t.title),...Object.values(t.short),...t.sections.ckb,...t.sections.en].join(' ').toLocaleLowerCase().includes(q));$('knowledgeCount').textContent=`${subset.length} ${T('allTopics')}`;
+ $('knowledgeGrid').innerHTML=subset.map((t,n)=>`<details class="knowledge-card" id="chapter-${t.id}"><summary><span class="knowledge-icon">${esc(t.icon)}</span><span class="knowledge-titles"><strong>${esc(l(t.title))}</strong><small>${esc(l(t.short))}</small></span><span class="knowledge-open">＋</span></summary><div class="knowledge-body">${l(t.sections).map(para=>`<p>${esc(para)}</p>`).join('')}<div class="knowledge-footer">TORRNAMA / PK · ${esc(T('supervisor'))}</div></div></details>`).join('')||`<div class="no-topic">${esc(T('noTopic'))}</div>`;
+}
+function renderLanguage(){document.querySelectorAll('[data-i18n-ext]').forEach(el=>el.textContent=T(el.dataset.i18nExt));$('knowledgeSearch').placeholder=label('گەڕان لە زانیارییەکان...','Search the knowledge library...');$('globalSearch').placeholder=label('گەڕان بۆ پرۆتۆکۆل...','Search protocols...');$('readAllLesson').setAttribute('aria-label',T('allSteps'));renderOSI();renderSequence();stepExplanation();renderKnowledge()}
+function showShortcuts(){const rows=[['Space',T('play')],['→',T('next')],['←',T('previous')],['V',T('diagram')+' / '+T('steps')],['D',label('پیشاندانی هێڵکاری بە تەنها','Diagram only')],['L',label('پیشاندانی لیستی پرۆتۆکۆل','Toggle protocol list')],['F',T('fullscreen')],['T',T('darkMode')],['Ctrl + K',T('keyboardSearch')],['?',T('help')],['Esc',T('close')]];
+ $('helpTitle').textContent=T('shortcuts');$('helpContent').innerHTML=`<p class="modal-lead">${esc(label('ئەم دوگمانە بۆ ئەوەی پڕۆژەکە بە ئاسانی بەکاربهێنیت.','Use these keyboard shortcuts to navigate the learning tool.'))}</p><div class="shortcut-grid">${rows.map(([key,value])=>`<div><kbd>${esc(key)}</kbd><span>${esc(value)}</span></div>`).join('')}</div>`;$('helpDialog').showModal()}
+function toggleLayout(c){document.body.classList.toggle(c)}
+function focusSearch(){if(window.innerWidth<850){$('openSidebar').click();$('search').focus()}else{$('globalSearch').focus();$('globalSearch').select()}}
+function onKey(e){if(e.key==='Escape')return;if(e.target.closest('input,textarea,select,dialog')||e.ctrlKey||e.metaKey||e.altKey){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();focusSearch()}return}
+ const k=e.key.toLowerCase();let handled=true;
+ switch(k){case ' ':api.playPause();break;case 'arrowright':api.jumpToStep(Math.min(api.state.index+1,api.proto().steps.length-1));break;case 'arrowleft':api.jumpToStep(Math.max(api.state.index-1,0));break;case 'v':setView(view==='network'?'sequence':'network');break;case 'd':toggleLayout('diagram-only');break;case 'l':if(innerWidth<850){$('openSidebar').click()}else{toggleLayout('sidebar-collapsed')}break;case 'f':toggleFullscreen();break;case 't':api.setTheme(api.state.theme==='dark'?'light':'dark');break;case '?':showShortcuts();break;default:handled=false}if(handled)e.preventDefault()}
+function toggleFullscreen(){if(document.fullscreenElement){document.exitFullscreen?.().catch(()=>{})}else{document.documentElement.requestFullscreen?.().catch(()=>{})}}
+function wire(){
+ $('viewNetwork').onclick=()=>setView('network');$('viewSequence').onclick=()=>setView('sequence');$('readAllLesson').onclick=showFullLesson;
+ $('sideToggle').onclick=()=>{if(innerWidth<850){$('openSidebar').click()}else{toggleLayout('sidebar-collapsed')}};$('diagramOnly').onclick=()=>toggleLayout('diagram-only');$('fullScreenBtn').onclick=toggleFullscreen;$('shortcutsBtn').onclick=showShortcuts;
+ $('closeHelp').onclick=()=>$('helpDialog').close();$('closePacket').onclick=()=>$('packetDialog').close();
+ for(const modal of [$('helpDialog'),$('packetDialog')]){modal.addEventListener('click',e=>{const r=modal.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)modal.close()})}
+ $('globalSearch').addEventListener('input',e=>{$('search').value=e.target.value;api.state.search=e.target.value;api.renderList();if(window.innerWidth>=850)document.body.classList.remove('sidebar-collapsed')});
+ $('search').addEventListener('input',e=>{$('globalSearch').value=e.target.value});$('knowledgeSearch').addEventListener('input',renderKnowledge);
+ $('packetRows').addEventListener('click',e=>{const row=e.target.closest('[data-packet-idx]');if(row)inspectPacket(Number(row.dataset.packetIdx))});
+ $('packetRows').addEventListener('keydown',e=>{if(e.key==='Enter'){const row=e.target.closest('[data-packet-idx]');if(row)inspectPacket(Number(row.dataset.packetIdx))}});
+ document.addEventListener('keydown',onKey);
+ document.addEventListener('torrnama:step',()=>{stepExplanation();renderSequence()});
+ document.addEventListener('torrnama:protocol',()=>{renderOSI();stepExplanation();renderSequence()});
+ document.addEventListener('torrnama:lang',renderLanguage);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+function start(){wire();renderLanguage();setView('network')}
+})();
